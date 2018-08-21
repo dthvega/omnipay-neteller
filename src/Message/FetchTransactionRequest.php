@@ -2,7 +2,6 @@
 
 namespace Omnipay\Neteller\Message;
 
-use Guzzle\Http\Exception\BadResponseException;
 use Omnipay\Common\Exception\InvalidRequestException;
 
 /**
@@ -23,14 +22,14 @@ class FetchTransactionRequest extends AbstractRequest
         if ($transactionId = $this->getTransactionId()) {
 
             return array(
-                'id'      => (string) $transactionId,
+                'id'      => (string)$transactionId,
                 'refType' => 'merchantRefId'
             );
 
         } elseif ($transactionReference = $this->getTransactionReference()) {
 
             return array(
-                'id' => (string) $transactionReference
+                'id' => (string)$transactionReference
             );
 
         } else {
@@ -57,12 +56,9 @@ class FetchTransactionRequest extends AbstractRequest
 
         $uri = $this->createUri('payments/' . $id, $data);
 
-        try {
-            $response = $this->httpClient->get($uri, $headers)->send();
-        } catch (BadResponseException $e) {
-            $response = $e->getResponse();
-        }
+        $response = $this->httpClient->request('GET', $uri, $headers);
 
-        return new FetchTransactionResponse($this, $response->json());
+        $json = json_decode($response->getBody()->getContents(), true);
+        return new FetchTransactionResponse($this, $json);
     }
 }

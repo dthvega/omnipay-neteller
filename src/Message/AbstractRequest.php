@@ -87,8 +87,8 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
             'grant_type' => 'client_credentials'
         ));
 
-        $response = $this->httpClient->post($uri, $headers)->send();
-        $json = $response->json();
+        $response = $this->httpClient->request('POST',$uri,$headers);
+        $json = json_decode($response->getBody()->getContents(),true);
 
         return $json['accessToken'];
     }
